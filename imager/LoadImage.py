@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #画像再構成プログラム
-#Ver 20
+#Version 20
+#
 
 import numpy as np
 from scipy import fftpack
