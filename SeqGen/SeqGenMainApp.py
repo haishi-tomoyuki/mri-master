@@ -8,7 +8,7 @@ Created on Mon Mar 12 17:31:48 2018
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import (QWidget, QPushButton, QLineEdit, QSizePolicy, QFileDialog, QApplication)
 import sys
-import convert5
+import convert
 from SeqGenMainwindow import Ui_MainWindow
 
 import numpy as np
