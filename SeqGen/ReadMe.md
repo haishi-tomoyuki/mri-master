@@ -7,3 +7,4 @@ python SeqGenMainApp.py
 anacondaからSeqGenMainApp.pyを実行してください
 
 test
+test
