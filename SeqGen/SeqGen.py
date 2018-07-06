@@ -120,8 +120,13 @@ class SeqDesign:
         else:
             seqPulseGrad = SeqPulseGrad(t_start, Gs_HEX, duration, self.G2, option='(GSlice_N)', gradType=GradType.Slice)
         self.addGrad_sub(seqPulseGrad, self.G2)
-        return seqPulseGrad             
-        
+        return seqPulseGrad
+    def addCrusherGrad(self, t_start, G_HEX, duration, direction):
+        #direction : self.Gr, self.G1, self.G2
+        seqPulseGrad = SeqPulseGrad(t_start, G_HEX, duration, direction, gradType=GradType.Crusher)
+        self.addGrad_sub(seqPulseGrad, direction)
+        return seqPulseGrad
+                             
     def addGrad_sub(self, seqPulseGrad, direction):
         if direction == 'x':
             self.pulse_GX.append(seqPulseGrad)
@@ -557,6 +562,11 @@ class SpinEcho(SeqDesign):
             #RFパルスの中心時刻とslice_Gradientの印加終了時刻の差 * 1.04 + 調整時間
             refocusGrad_duration = int((t_SliceG_e - t_90_c) * 1.04) + self.hardware.GDA    
             self.addSliceGrad(t_SliceG_e, refocusGrad_duration, BW=seqPulseRF90.BW, isNegative=True)
+            #crusher
+            self.addCrusherGrad(t_180-GRampEnc2-1500, 0xC000, 500, self.G2)
+            self.addCrusherGrad(t_180+seqPulseRF180.duration+300, 0xC000, 500, self.G2)
+            
+        #direction : self.Gr, self.G1, self.G2
         self.addAD(t_AD, d_AD)
         #read (dephase)
         d_Read_dephase = d_AD/2 + GRampRead/2
@@ -773,6 +783,7 @@ class GradType(enum.Enum):  #GradTypeを列挙型で定義しておく
     PhaseRewind1 = 'PhaseRewind1'
     PhaseRewind2 = 'PhaseRewind2'
     Slice = 'Slice'
+    Crusher = 'Crusher'
 
 class RFType(enum.Enum):  #RFPuplseを列挙型で定義しておく
     sinc90_8kHz = '0x0000'
