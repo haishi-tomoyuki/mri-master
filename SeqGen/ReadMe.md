@@ -1,6 +1,6 @@
 ﻿MRI sequence generator for Sampler-seq 
 ---
-\python SeqGenMainApp.py\
+`python SeqGenMainApp.py`
 
 または
 
