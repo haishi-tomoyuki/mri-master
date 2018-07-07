@@ -1,6 +1,6 @@
-﻿Seqence generatorです。
-
-python SeqGenMainApp.py
+﻿MRI sequence generator for Sampler-seq 
+---
+'python SeqGenMainApp.py'
 
 または
 
