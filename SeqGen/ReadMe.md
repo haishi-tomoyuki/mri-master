@@ -1,10 +1,7 @@
-﻿Seqence generator
+﻿Seqence generatorです。
 
 python SeqGenMainApp.py
 
 または
 
-anacondaからSeqGenMainApp.pyを実行してください
-
-test
-test
+Spyder(anaconda)でSeqGenMainApp.pyを実行してください
