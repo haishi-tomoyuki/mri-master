@@ -95,22 +95,26 @@ class SeqDesign:
         return seqPulseGrad             
     def addPE1Grad(self, t_start, option='<-e5', table=None, filename=None):
         d_enc = self.calc_PhaseEncodeTime(self.G1, self.S1, self.FOVe1)
-        seqPulseGrad = SeqPulseGrad(t_start, self.S1*self.N1/2+32768, d_enc, self.G1, option=option, table=None, filename=None, gradType=GradType.PhaseEncode1)
+        #seqPulseGrad = SeqPulseGrad(t_start, self.S1*self.N1/2+32768, d_enc, self.G1, option=option, table=None, filename=None, gradType=GradType.PhaseEncode1)
+        seqPulseGrad = SeqPulseGrad(t_start, 32768, d_enc, self.G1, option=option, table=None, filename=None, gradType=GradType.PhaseEncode1)
         self.addGrad_sub(seqPulseGrad, self.G1)
         return seqPulseGrad             
     def addPERew1Grad(self, t_start, option='<-c5', table=None, filename=None):
         d_enc = self.calc_PhaseEncodeTime(self.G1, self.S1, self.FOVe1)
-        seqPulseGrad = SeqPulseGrad(t_start, self.S1*self.N1/2+32768, d_enc, self.G1, option=option, table=None, filename=None, gradType=GradType.PhaseRewind1)
+        #seqPulseGrad = SeqPulseGrad(t_start, 32768-self.S1*self.N1/2, d_enc, self.G1, option=option, table=None, filename=None, gradType=GradType.PhaseRewind1)
+        seqPulseGrad = SeqPulseGrad(t_start, 32768, d_enc, self.G1, option=option, table=None, filename=None, gradType=GradType.PhaseRewind1)
         self.addGrad_sub(seqPulseGrad, self.G1)
         return seqPulseGrad             
     def addPE2Grad(self, t_start, option='<-e6', table=None, filename=None):
         d_enc = self.calc_PhaseEncodeTime(self.G2, self.S2, self.FOVe2)
-        seqPulseGrad = SeqPulseGrad(t_start, self.S2*self.N2/2+32768, d_enc, self.G2, option=option, table=None, filename=None, gradType=GradType.PhaseEncode2)
+        #seqPulseGrad = SeqPulseGrad(t_start, self.S2*self.N2/2+32768, d_enc, self.G2, option=option, table=None, filename=None, gradType=GradType.PhaseEncode2)
+        seqPulseGrad = SeqPulseGrad(t_start, 32768, d_enc, self.G2, option=option, table=None, filename=None, gradType=GradType.PhaseEncode2)
         self.addGrad_sub(seqPulseGrad, self.G2)
         return seqPulseGrad             
     def addPERew2Grad(self, t_start, option='<-c6'):
         d_enc = self.calc_PhaseEncodeTime(self.G2, self.S2, self.FOVe2, table=None, filename=None)
-        seqPulseGrad = SeqPulseGrad(t_start, self.S2*self.N2/2+32768, d_enc, self.G2, option=option, table=None, filename=None, gradType=GradType.PhaseRewind2)
+        #seqPulseGrad = SeqPulseGrad(t_start, 32768-self.S2*self.N2/2, d_enc, self.G2, option=option, table=None, filename=None, gradType=GradType.PhaseRewind2)
+        seqPulseGrad = SeqPulseGrad(t_start, 32768, d_enc, self.G2, option=option, table=None, filename=None, gradType=GradType.PhaseRewind2)
         self.addGrad_sub(seqPulseGrad, self.G2)
         return seqPulseGrad             
     def addSliceGrad(self, t_start, duration, BW=-1, isNegative = False):
@@ -553,7 +557,7 @@ class SpinEcho(SeqDesign):
             seqPulseRF90 = self.addRFpulse(t_90, RFType.MS90, phase=0)
             seqPulseRF180 = self.addRF180(t_180)
             #slice G
-            t_SliceG_s = t_90-1000
+            t_SliceG_s = t_90-500
             d_SliceG =  seqPulseRF90.duration+1000
             t_SliceG_e = t_SliceG_s + d_SliceG
             self.addSliceGrad(t_SliceG_s, d_SliceG, BW=seqPulseRF90.BW)  
