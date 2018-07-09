@@ -1,10 +1,14 @@
-﻿Seqence generator
+﻿SeqGen: MRI sequence generator for Sampler-seq 
+------
 
-python SeqGenMainApp.py
+SeqGen is an MRI sequence generator for the MRTechnology Compact MRI system running Sampler software.
 
-または
+------
+# Getting started
 
-anacondaからSeqGenMainApp.pyを実行してください
+`cd` to the donwloaded folder and run the command:
+`python SeqGenMainApp.py`  
 
-test
-test
+or  
+
+open and execute 'SeqGenMainApp.py' on Spyder (anaconda)
