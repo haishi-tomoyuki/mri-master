@@ -588,7 +588,7 @@ class Calc_seqchart:
                 isUD = True
                 
             if event[i].type == 'PH':
-                phase = int(event[i].value,16) / 0x0010 * np.pi/2  #radian
+                phase = int(event[i].value,16) / 0x0100 * np.pi/2  #radian
             if event[i].type == 'RF':
                 if event[i].value == '0002':  #90 hard pulse
                     seqchart_RFx[event[i].time : event[i].time+120] = 90*np.cos(phase)
