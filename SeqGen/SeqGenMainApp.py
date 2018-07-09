@@ -144,11 +144,11 @@ class MyForm(QtWidgets.QMainWindow):
         self.ui.spinBox_DU.setValue(seqDesign.DU)        
         self.ui.spinBox_TR.setValue(seqDesign.TR)        
         self.ui.spinBox_DW.setValue(seqDesign.DW)        
-        self.ui.spinBox_SW.setValue(seqDesign.SW)        
-        self.ui.spinBox_OF.setValue(seqDesign.OF)        
-        self.ui.spinBox_FOVr.setValue(seqDesign.FOVr)  
-        self.ui.spinBox_FOVe1.setValue(seqDesign.FOVe1)  
-        self.ui.spinBox_FOVe2.setValue(seqDesign.FOVe2)
+        self.ui.doubleSpinBox_SW.setValue(seqDesign.SW)        
+        self.ui.doubleSpinBox_OF.setValue(seqDesign.OF)        
+        self.ui.doubleSpinBox_FOVr.setValue(seqDesign.FOVr)  
+        self.ui.doubleSpinBox_FOVe1.setValue(seqDesign.FOVe1)  
+        self.ui.doubleSpinBox_FOVe2.setValue(seqDesign.FOVe2)
         
     def GetHardwareInfo(self):
         #tabWidget_Hardwareから必要な情報を取り出す
