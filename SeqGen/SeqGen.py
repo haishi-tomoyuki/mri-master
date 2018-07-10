@@ -59,7 +59,7 @@ class SeqDesign:
         self.comments = []   #list of comments
         
         self.isCurrentOver = None   #抵抗を考慮した電流制限値を超えたかどうか
-        
+    
     #RF pulse関係
     def addRF90(self, t_start, phase=0):
         seqPulseRF = SeqPulseRF(t_start, RFType.hard90, phase=phase)
@@ -342,8 +342,24 @@ class SeqDesign:
                 pulse.comment = 'Caution : Current exceeds limit!!!'
         return isViolated
             
-                
-        
+    def CheckTR(self):
+        """
+        pulse終了時間よりもTRを長くする
+        """
+        self.CheckTR_sub(self.pulse_GX)
+        self.CheckTR_sub(self.pulse_GY)
+        self.CheckTR_sub(self.pulse_GZ)
+        self.CheckTR_sub(self.pulse_RF)
+        self.CheckTR_sub(self.pulse_AD)
+
+    def CheckTR_sub(self, pulse_l):
+        if len(pulse_l)>0:
+            for pulse in pulse_l:
+                last_time = int((pulse.t_start + pulse.duration)/1000 + 1)  #ms
+                if last_time > self.TR:
+                    print('TR is too short!!! Automatically modified TR')
+                    self.TR = last_time
+       
     def Cal_kloc(self):
         #ノミナルのkloc算出
         self.kloc_x_nominal = Calc_kloc.Calc_kloc_nominal(self.seq_GX, self.seq_AD, I_max=self.hardware.MaxCurrent, G_eff = self.hardware.GX, DW=self.DW, actualNR=self.NR, OS = self.OS)
@@ -586,8 +602,8 @@ class SpinEcho(SeqDesign):
         if self.is3D:
             t_enc2 = t_180 + seqPulseRF180.duration + 100  #margin 100us
             self.addPE2Grad(t_enc2)
-                
- 
+        
+        self.CheckTR()
 
 class SpinEcho_H(SeqDesign):
     def __init__(self, hardware):
@@ -640,15 +656,8 @@ class SpinEcho_H(SeqDesign):
                 t_AD = t_AD_c - d_AD/2       #start time (ADC)
                 self.addAD(t_AD, d_AD)
                 
-        self.CheckCurrentLimit()
-        self.showPulseList()
-        self.pulse2event()
-        self.gen_notes()
-        self.showNotes()
-        self.Seqchart()
-                
-     
-       
+        self.CheckTR()
+  
 class SeqPulse:
     def __init__(self, _type, t_start, value, duration=100, option='', table=None, filename=None, comment=None):
         self.type = _type    #GX, GY, GZ, AD, RF, PH
@@ -829,9 +838,9 @@ def test1():
     se.TR = 50
     se.genSeq()
     se.addComment('This is a test')
-    se.CheckCurrentLimit()
     se.showPulseList()
     se.pulse2event()
+    se.CheckCurrentLimit()
     #se.showEventList()
     se.gen_notes()
     se.showNotes()
@@ -852,13 +861,14 @@ def test_SEH():
     SEH = SpinEcho_H(hardware)
     SEH.fromfile('tau.csv')
     SEH.DW=1
-    SEH.TR=100
+    SEH.TR=1000
     SEH.genSeq(filename_RF90 = 'hard90_10us.txt', filename_RF180 = 'hard180_10us_y.txt')
-    SEH.CheckCurrentLimit()
     SEH.showPulseList()
     SEH.pulse2event()
+    SEH.CheckCurrentLimit()
     SEH.gen_notes()
     SEH.showNotes()
+    SEH.Seqchart()
     """
     fig = plt.figure()
     plt.plot(SEH.seq_RFx)

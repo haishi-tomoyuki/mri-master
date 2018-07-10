@@ -103,9 +103,11 @@ class MyForm(QtWidgets.QMainWindow):
         self.filename_RF180 = self.ui.textBrowser_RFpulse180.toPlainText()
         self.GetGeneralParams(self.SEH)
         self.SEH.genSeq(filename_RF90 = self.filename_RF90, filename_RF180 = self.filename_RF180)
+        print('OK')
         self.SEH.addComment(self.ui.textEdit_comments.toPlainText())
         self.SEH.CheckCurrentLimit()
         self.showPulseList(self.SEH)
+        
         self.SEH.pulse2event()
         #self.showEventList(self.seqDesign)
         self.SEH.gen_notes()
