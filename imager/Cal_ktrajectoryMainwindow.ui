@@ -1,0 +1,630 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>942</width>
+    <height>737</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QListWidget" name="listWidget_G_read">
+    <property name="geometry">
+     <rect>
+      <x>60</x>
+      <y>110</y>
+      <width>31</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="selectionRectVisible">
+     <bool>true</bool>
+    </property>
+    <property name="currentRow">
+     <number>0</number>
+    </property>
+    <item>
+     <property name="text">
+      <string>x</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>y</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>z</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QPushButton" name="pushButton_CalKtra_GIRF">
+    <property name="geometry">
+     <rect>
+      <x>550</x>
+      <y>490</y>
+      <width>211</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Calcurate k-trajectory (GIRF)</string>
+    </property>
+   </widget>
+   <widget class="QListWidget" name="listWidget_G_encode1">
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>110</y>
+      <width>31</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="selectionRectVisible">
+     <bool>true</bool>
+    </property>
+    <property name="currentRow">
+     <number>1</number>
+    </property>
+    <item>
+     <property name="text">
+      <string>x</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>y</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>z</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QWidget" name="gridLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>70</x>
+      <y>320</y>
+      <width>861</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="2" column="4">
+      <widget class="QTextBrowser" name="textBrowser_GIRFy_GY"/>
+     </item>
+     <item row="1" column="5">
+      <widget class="QPushButton" name="pushButton_openGIRFx_GZ">
+       <property name="text">
+        <string>open</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="5">
+      <widget class="QPushButton" name="pushButton_openGIRFy_GZ">
+       <property name="text">
+        <string>open</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="3">
+      <widget class="QPushButton" name="pushButton_openGIRFx_GY">
+       <property name="text">
+        <string>open</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="2">
+      <widget class="QTextBrowser" name="textBrowser_GIRFx_GX"/>
+     </item>
+     <item row="2" column="6">
+      <widget class="QTextBrowser" name="textBrowser_GIRFy_GZ"/>
+     </item>
+     <item row="0" column="4" alignment="Qt::AlignHCenter">
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>GY</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="6">
+      <widget class="QTextBrowser" name="textBrowser_GIRFx_GZ"/>
+     </item>
+     <item row="2" column="1">
+      <widget class="QPushButton" name="pushButton_openGIRFy_GX">
+       <property name="text">
+        <string>open</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="label_6">
+       <property name="text">
+        <string>y_data</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QPushButton" name="pushButton_openGIRFx_GX">
+       <property name="text">
+        <string>open</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0" alignment="Qt::AlignHCenter|Qt::AlignVCenter">
+      <widget class="QLabel" name="label_5">
+       <property name="text">
+        <string>x</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="4">
+      <widget class="QTextBrowser" name="textBrowser_GIRFx_GY"/>
+     </item>
+     <item row="2" column="2">
+      <widget class="QTextBrowser" name="textBrowser_GIRFy_GX"/>
+     </item>
+     <item row="2" column="3">
+      <widget class="QPushButton" name="pushButton_openGIRFy_GY">
+       <property name="text">
+        <string>open</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="2" alignment="Qt::AlignHCenter">
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>GX</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="6" alignment="Qt::AlignHCenter">
+      <widget class="QLabel" name="label_4">
+       <property name="text">
+        <string>GZ</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QLabel" name="label_39">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>120</y>
+      <width>22</width>
+      <height>59</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>read</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_CalKtra_nominal">
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>490</y>
+      <width>211</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Calcurate  k-trajectory (nominal)</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>360</y>
+      <width>50</width>
+      <height>12</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>GIRF</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_41">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>110</y>
+      <width>42</width>
+      <height>73</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>encode2</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_SaveKtra_GIRF">
+    <property name="geometry">
+     <rect>
+      <x>630</x>
+      <y>650</y>
+      <width>41</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>save</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_SaveKtra_nominal">
+    <property name="geometry">
+     <rect>
+      <x>230</x>
+      <y>650</y>
+      <width>41</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>save</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_OpenSeqFile">
+    <property name="geometry">
+     <rect>
+      <x>70</x>
+      <y>50</y>
+      <width>111</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>open sequence file</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_ShowKtraView_GIRF">
+    <property name="geometry">
+     <rect>
+      <x>590</x>
+      <y>580</y>
+      <width>131</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>k-trajectory view</string>
+    </property>
+   </widget>
+   <widget class="QTextBrowser" name="textBrowser_SeqFile">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>50</y>
+      <width>711</width>
+      <height>22</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_40">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>110</y>
+      <width>42</width>
+      <height>73</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>encode1</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_ShowKtraView_nominal">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>580</y>
+      <width>131</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>k-trajectory view</string>
+    </property>
+   </widget>
+   <widget class="QListWidget" name="listWidget_G_encode2">
+    <property name="geometry">
+     <rect>
+      <x>240</x>
+      <y>110</y>
+      <width>31</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="selectionRectVisible">
+     <bool>true</bool>
+    </property>
+    <property name="currentRow">
+     <number>2</number>
+    </property>
+    <item>
+     <property name="text">
+      <string>x</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>y</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>z</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QPushButton" name="pushButton_ShowGIRFView">
+    <property name="geometry">
+     <rect>
+      <x>360</x>
+      <y>410</y>
+      <width>189</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>GIRF View</string>
+    </property>
+   </widget>
+   <widget class="QWidget" name="gridLayoutWidget_2">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>180</y>
+      <width>891</width>
+      <height>100</height>
+     </rect>
+    </property>
+    <layout class="QGridLayout" name="gridLayout_2">
+     <item row="0" column="2">
+      <widget class="QLabel" name="label_14">
+       <property name="text">
+        <string>GX Ramp [us]</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QDoubleSpinBox" name="doubleSpinBox_GY">
+       <property name="decimals">
+        <number>4</number>
+       </property>
+       <property name="maximum">
+        <double>10000000.000000000000000</double>
+       </property>
+       <property name="value">
+        <double>1.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="4">
+      <widget class="QLabel" name="label_7">
+       <property name="text">
+        <string>Max Current [I]</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="4">
+      <widget class="QLabel" name="label_10">
+       <property name="text">
+        <string>Max Voltage [V]</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="3">
+      <widget class="QDoubleSpinBox" name="doubleSpinBox_GrampX">
+       <property name="decimals">
+        <number>0</number>
+       </property>
+       <property name="minimum">
+        <double>0.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>10000000.000000000000000</double>
+       </property>
+       <property name="value">
+        <double>0.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_9">
+       <property name="text">
+        <string>GY [G/cm/A]</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="3">
+      <widget class="QDoubleSpinBox" name="doubleSpinBox_GrampY">
+       <property name="decimals">
+        <number>0</number>
+       </property>
+       <property name="minimum">
+        <double>0.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>10000000.000000000000000</double>
+       </property>
+       <property name="value">
+        <double>0.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="2">
+      <widget class="QLabel" name="label_17">
+       <property name="text">
+        <string>GZ Ramp [us]</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="3">
+      <widget class="QDoubleSpinBox" name="doubleSpinBox_GrampZ">
+       <property name="decimals">
+        <number>0</number>
+       </property>
+       <property name="minimum">
+        <double>0.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>10000000.000000000000000</double>
+       </property>
+       <property name="value">
+        <double>0.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="2">
+      <widget class="QLabel" name="label_15">
+       <property name="text">
+        <string>GY Ramp [us]</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="5">
+      <widget class="QDoubleSpinBox" name="doubleSpinBox_MaxVoltage">
+       <property name="decimals">
+        <number>0</number>
+       </property>
+       <property name="maximum">
+        <double>10000000.000000000000000</double>
+       </property>
+       <property name="value">
+        <double>20.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="label_16">
+       <property name="text">
+        <string>GZ [G/cm/A]</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QDoubleSpinBox" name="doubleSpinBox_GX">
+       <property name="decimals">
+        <number>4</number>
+       </property>
+       <property name="minimum">
+        <double>0.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>10000000.000000000000000</double>
+       </property>
+       <property name="value">
+        <double>1.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="label_8">
+       <property name="text">
+        <string>GX [G/cm/A]</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="5">
+      <widget class="QDoubleSpinBox" name="doubleSpinBox_MaxCurrent">
+       <property name="decimals">
+        <number>0</number>
+       </property>
+       <property name="maximum">
+        <double>10000000.000000000000000</double>
+       </property>
+       <property name="value">
+        <double>10.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QDoubleSpinBox" name="doubleSpinBox_GZ">
+       <property name="decimals">
+        <number>4</number>
+       </property>
+       <property name="maximum">
+        <double>10000000.000000000000000</double>
+       </property>
+       <property name="value">
+        <double>1.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QLabel" name="label_13">
+    <property name="geometry">
+     <rect>
+      <x>300</x>
+      <y>140</y>
+      <width>61</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>FOV</string>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="doubleSpinBox_FOV">
+    <property name="geometry">
+     <rect>
+      <x>330</x>
+      <y>140</y>
+      <width>122</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="decimals">
+     <number>2</number>
+    </property>
+    <property name="minimum">
+     <double>0.000000000000000</double>
+    </property>
+    <property name="maximum">
+     <double>10000000.000000000000000</double>
+    </property>
+    <property name="value">
+     <double>10.000000000000000</double>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="radioButton_normalization">
+    <property name="geometry">
+     <rect>
+      <x>470</x>
+      <y>140</y>
+      <width>86</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>-pi~pi</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>942</width>
+     <height>21</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
