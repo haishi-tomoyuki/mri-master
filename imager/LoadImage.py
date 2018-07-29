@@ -285,10 +285,14 @@ class SeqInfo:
     string : filename_kxloc, filename_kyloc, filename_kzloc
     list<string>: event_list, event_GX, event_GY, event_GZ, event_RF, event_AD
     
-    <<<generated when isSeqchart = True>>>
+    <<<generated if isSeqchart = True>>>
     array: seq_GX, seq_GY, seq_GZ, seq_RFx, seq_RFy, seq_AD
+    if isGradSimple:
+        seq_GX, seq_GY, seq_GZ -> 2D
+    else:
+        3D
     """
-    def __init__(self, filename_seq, isSeqchart = False, GrampX=0, GrampY=0, GrampZ=0):
+    def __init__(self, filename_seq, isSeqchart = False, isGradSimple = True, GrampX=0, GrampY=0, GrampZ=0):
         self.filename_seq = filename_seq
         try:
             f = open(filename_seq)  
@@ -300,7 +304,7 @@ class SeqInfo:
             self.Readheader()
             self.ReadLocationFiles()
         if isSeqchart:
-            self.Seqchart(GrampX=GrampX, GrampY=GrampY, GrampZ=GrampZ)
+            self.Seqchart(GrampX = GrampX, GrampY=GrampY, GrampZ=GrampZ, isGradSimple = isGradSimple)
             
         
     def ReadLocationFiles(self):
@@ -410,7 +414,11 @@ class SeqInfo:
             self.event_list[i] = temp
         
     
-    def Seqchart(self, GrampX=0, GrampY=0, GrampZ=0):
+    def Seqchart(self, GrampX=0, GrampY=0, GrampZ=0, isGradSimple=True):
+        """
+        seq_GX, seq_GY, seq_GZ, seq_RFx, seq_RFy, seq_ADを作成
+        isGradSimpleがTrueの場合は, seq_GX, seq_Gy, seq_GZは2D
+        """
         self.Eventlist()
         self.event_GX = []
         self.event_GY = []
@@ -433,12 +441,14 @@ class SeqInfo:
             else:
                 break
         t1 = time.time()
-        #self.seq_GX = Calc_seqchart.Grad(self.event_GX, self.TR, self.N1, self.N2, Gramp=300)
-        #self.seq_GY = Calc_seqchart.Grad(self.event_GY, self.TR, self.N1, self.N2, Gramp=300)
-        #self.seq_GZ = Calc_seqchart.Grad(self.event_GZ, self.TR, self.N1, self.N2, Gramp=300)
-        self.seq_GX = Calc_seqchart.Grad_simple(self.event_GX, self.TR, self.N1, self.N2, Gramp=GrampX)
-        self.seq_GY = Calc_seqchart.Grad_simple(self.event_GY, self.TR, self.N1, self.N2, Gramp=GrampY)
-        self.seq_GZ = Calc_seqchart.Grad_simple(self.event_GZ, self.TR, self.N1, self.N2, Gramp=GrampZ)
+        if isGradSimple:
+            self.seq_GX = Calc_seqchart.Grad_simple(self.event_GX, self.TR, self.N1, self.N2, Gramp=GrampX)
+            self.seq_GY = Calc_seqchart.Grad_simple(self.event_GY, self.TR, self.N1, self.N2, Gramp=GrampY)
+            self.seq_GZ = Calc_seqchart.Grad_simple(self.event_GZ, self.TR, self.N1, self.N2, Gramp=GrampZ)
+        else:
+            self.seq_GX = Calc_seqchart.Grad(self.event_GX, self.TR, self.N1, self.N2, Gramp=300)
+            self.seq_GY = Calc_seqchart.Grad(self.event_GY, self.TR, self.N1, self.N2, Gramp=300)
+            self.seq_GZ = Calc_seqchart.Grad(self.event_GZ, self.TR, self.N1, self.N2, Gramp=300)
         self.seq_RFx, self.seq_RFy = Calc_seqchart.RF(self.event_RF, self.TR)
         self.seq_AD = Calc_seqchart.AD(self.event_AD, self.TR, self.NR, self.DW)
         t2 = time.time()
@@ -769,7 +779,7 @@ class Calc_kloc:
     @staticmethod
     def Calc_gradient_predict(filename_GIRF,filename_GIRFx, seq_G, f_cut=20, amp_cut=1.2, offset=32768):
         """
-        GIRF予測のgradientを計算
+        GIRF予測のgradientを計算 (2D)
         """
         GIRF = np.fromfile(filename_GIRF, dtype = "complex128")
         GIRF_x = np.fromfile(filename_GIRFx,dtype="float64")
