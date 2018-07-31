@@ -281,6 +281,7 @@ class SeqInfo:
     array : DW, NR, N1, N2, ...
     array<string> : notes
     array<string> : comments
+    array<string> : parameters
     int : actual NR, N_cut, N_ks
     string : filename_kxloc, filename_kyloc, filename_kzloc
     list<string>: event_list, event_GX, event_GY, event_GZ, event_RF, event_AD
@@ -346,6 +347,7 @@ class SeqInfo:
                                     
     def Readheader(self):
         self.comments = []
+        self.parameters = []
         for line in self.notes:
             keyword = ':DW '
             temp = line.find(keyword)
@@ -387,10 +389,18 @@ class SeqInfo:
             temp = line.find(keyword)
             if (temp>=0):
                 self.S2 = int(line[temp+len(keyword):-1])
-            keyword = ';'
+            keyword = ':DU '
             temp = line.find(keyword)
             if (temp>=0):
-                self.comments.append(line)
+                self.DU = int(line[temp+len(keyword):-1])
+            keyword = ':NX '
+            temp = line.find(keyword)
+            if (temp>=0):
+                self.NX = int(line[temp+len(keyword):-1])
+            if line[0] == ';':
+                self.comments.append(line[:-1])
+            if line[0] == ':':
+                self.parameters.append(line[:-1])
 
     def Eventlist(self):
         self.event_list = []
@@ -454,6 +464,54 @@ class SeqInfo:
         t2 = time.time()
         print(t2-t1)
         
+    def SaveFile(self, filename):
+        self.gen_notes()
+        if filename != '':
+            f = open(filename, 'w') # 書き込みモードで開く
+            for line in self.notes:
+                f.write(line+'\n')
+            f.close()
+            
+    def gen_notes(self):
+        self.notes = []
+        
+        #parameterを書き込む
+        """
+        self.notes.append(':NX '+str(self.NX))
+        self.notes.append(':NR '+str(self.NR))
+        self.notes.append(':N1 '+str(self.N1))
+        self.notes.append(':N2 '+str(self.N2))
+        self.notes.append(':S1 '+str(self.S1))
+        self.notes.append(':S2 '+str(self.S2))
+        self.notes.append(':DU '+str(self.DU))
+        self.notes.append(':TR '+str(self.TR))
+        self.notes.append(':DW '+str(self.DW))
+        self.notes.append('')
+        self.notes.append(':SW '+str(self.SW))
+        self.notes.append(':OF '+str(self.OF))
+        
+        self.notes.append('')
+
+        self.notes.append(':EL '+str(self.EL))
+        """
+        for parameter in self.parameters:
+            self.notes.append(parameter)
+
+        self.notes.append('')
+
+        #event_listを書き込む        
+        for event in self.event_list:
+            if event.line[-1] == '\n':
+                self.notes.append(event.line[:-1])  #改行コードを消す
+            else:
+                self.notes.append(event.line)
+
+            
+        self.notes.append('')
+
+        #commentを書き込む
+        self.notes += self.comments
+
 
 class Calc_seqchart:
     @staticmethod  #static method (インスタンス化しないで使えるスタティックメソッド)
@@ -472,11 +530,11 @@ class Calc_seqchart:
                if any(event[i].table) == False:
                    seqchart[event[i].time:,:,:] = int(event[i].value,16)
                else:
-                   if re.findall('<-.*?5', event[i].option):
+                   if re.findall('<-e5', event[i].option) or re.findall('<-c5', event[i].option) or re.findall('<-v5', event[i].option):
                        for j in range(N1):
                            seqchart[event[i].time:,j,:] = int(event[i].table[j],16) 
-                   if re.findall('<-.*?6', event[i].option):
-                       for k in range(N2):
+                   if re.findall('<-e6', event[i].option) or re.findall('<-c6', event[i].option) or re.findall('<-v6', event[i].option):
+                      for k in range(N2):
                            seqchart[event[i].time:,:,k] = int(event[i].table[k],16) 
         else:  #傾斜制御あり
             for i in range(len(event)):
@@ -491,7 +549,7 @@ class Calc_seqchart:
                            seqchart[event[i].time+Gramp:, j, k] = val_after
                        
                else:
-                   if re.findall('<-.*?5', event[i].option):
+                   if re.findall('<-e5', event[i].option) or re.findall('<-c5', event[i].option) or re.findall('<-v5', event[i].option):
                        for j in range(N1):
                            for k in range(N2):
                                val_before = seqchart[event[i].time, j, k]
@@ -501,7 +559,7 @@ class Calc_seqchart:
                                    seqchart[event[i].time + ni, j, k] = slope*ni + val_before
                                seqchart[event[i].time+Gramp: ,j ,k] = val_after 
 
-                   if re.findall('<-.*?6', event[i].option):
+                   if re.findall('<-e6', event[i].option) or re.findall('<-c6', event[i].option) or re.findall('<-v6', event[i].option):
                        for j in range(N1):
                            for k in range(N2):
                                val_before = seqchart[event[i].time, j, k]
@@ -530,10 +588,12 @@ class Calc_seqchart:
                if any(event[i].table) == False:
                    seqchart[event[i].time:,:] = int(event[i].value,16)
                else:
-                   if re.findall('<-.*?5', event[i].option):
+#                   if re.findall('<-.*?5', event[i].option):
+                   if re.findall('<-e5', event[i].option) or re.findall('<-c5', event[i].option) or re.findall('<-v5', event[i].option):
+                        #print(event[i].option)
                        for j in range(N1):
                            seqchart[event[i].time:,j] = int(event[i].table[j],16) 
-                   if re.findall('<-.*?6', event[i].option):
+                   if re.findall('<-e6', event[i].option) or re.findall('<-c6', event[i].option) or re.findall('<-v6', event[i].option):
                        for k in range(N2):
                            seqchart[event[i].time:,k] = int(event[i].table[k],16) 
         else: #傾斜制御あり
@@ -548,7 +608,7 @@ class Calc_seqchart:
                        seqchart[event[i].time+Gramp:, j] = val_after
                        
                else:
-                   if re.findall('<-.*?5', event[i].option):
+                   if re.findall('<-e5', event[i].option) or re.findall('<-c5', event[i].option) or re.findall('<-v5', event[i].option):
                        for j in range(N1):
                            val_before = seqchart[event[i].time,j]
                            val_after = int(event[i].table[j],16)
@@ -557,7 +617,7 @@ class Calc_seqchart:
                                seqchart[event[i].time + ni,j] = slope*ni + val_before
                            seqchart[event[i].time+Gramp:,j] = val_after 
 
-                   if re.findall('<-.*?6', event[i].option):
+                   if re.findall('<-e6', event[i].option) or re.findall('<-c6', event[i].option) or re.findall('<-v6', event[i].option):
                        for k in range(N2):
                            val_before = seqchart[event[i].time,k]
                            val_after = int(event[i].table[k],16)
@@ -654,6 +714,14 @@ class Seqevent:
             self.isTimeEvent = True
             
             #ファイル名があれば取り出す
+            temp2=re.findall(".txt", self.option)
+            if temp2:
+                if self.option[-1] == '\n':
+                    self.option = self.option[:-1]
+                if self.type == 'GX' or self.type == 'GY' or self.type == 'GZ':
+                    self.filename =self.option[5:len(self.option)-1]
+                    self.table = self.Get_TablelistFromFile(self.filename, N1, N2, S1, S2) #
+            #ファイル名があれば取り出す
             temp2=re.findall("=", self.option)
             if temp2:
                 self.filename =self.option[2:len(self.option)-1]
@@ -701,7 +769,15 @@ class Seqevent:
         ファイルからGradientテーブル情報を得る(未実装)
         self.tableに格納
         """
-        pass
+        table = []
+        ####
+        with open(filename, 'rt') as f:
+            lines = f.readlines() # 1行毎にファイル終端まで全て読む(改行文字も含まれる)
+        n = int(lines[0])
+        for i in range(1,n+1):
+            table.append(lines[i][:-1])  #改行コードは除く
+        return table
+        
     
     def Get_RFPulseFromFile(self, filename):
         """
@@ -779,15 +855,21 @@ class Calc_kloc:
     @staticmethod
     def Calc_gradient_predict(filename_GIRF,filename_GIRFx, seq_G, f_cut=20, amp_cut=1.2, offset=32768):
         """
-        GIRF予測のgradientを計算 (2D)
+        GIRF予測のgradientを計算 (2D and 3D)
         """
         GIRF = np.fromfile(filename_GIRF, dtype = "complex128")
         GIRF_x = np.fromfile(filename_GIRFx,dtype="float64")
         gradient_predict = np.zeros(np.shape(seq_G))
         gradient_x = np.arange(seq_G.shape[0],dtype="float64")*1e-3 #[ms]
-        for i in range(seq_G.shape[1]):
-            print(i,end=",")
-            gradient_predict[:,i]= Calc_Goutput(seq_G[:,i]-offset, gradient_x, GIRF, GIRF_x, f_cut=f_cut, amp_cut=amp_cut)
+        if len(seq_G.shape) > 2:    #3D
+            for j in range(seq_G.shape[2]):
+                for i in range(seq_G.shape[1]):
+                    print(i,j,end=",")
+                    gradient_predict[:,i,j]= Calc_Goutput(seq_G[:,i,j]-offset, gradient_x, GIRF, GIRF_x, f_cut=f_cut, amp_cut=amp_cut)
+        else:                       #2D
+            for i in range(seq_G.shape[1]):
+                print(i,end=",")
+                gradient_predict[:,i]= Calc_Goutput(seq_G[:,i]-offset, gradient_x, GIRF, GIRF_x, f_cut=f_cut, amp_cut=amp_cut)            
         return gradient_predict+offset
                     
         
@@ -933,7 +1015,8 @@ class Standard_Header:
 
 def test():
     #load seq with seqchart
-    seq = SeqInfo('00001002-2DRadial_GE_10cm_ny256-145548.seq', isSeqchart=True)
+    #seq = SeqInfo('00001002-2DRadial_GE_10cm_ny256-145548.seq', isSeqchart=True)
+    seq = SeqInfo('test.seq', isSeqchart=True)
     plt.plot(seq.seq_GX)
     #load img
   #  img = Imager('test.img')
