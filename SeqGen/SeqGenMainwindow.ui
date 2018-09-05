@@ -508,7 +508,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab_SE">
      <attribute name="title">
@@ -563,6 +563,32 @@
       </property>
       <property name="checked">
        <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_28">
+      <property name="geometry">
+       <rect>
+        <x>90</x>
+        <y>100</y>
+        <width>481</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_29">
+      <property name="geometry">
+       <rect>
+        <x>110</x>
+        <y>100</y>
+        <width>491</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>For 2D sequence, refocus grad. duration is adjusted by &quot;Gradient Duration Adjustment 1&quot;</string>
       </property>
      </widget>
     </widget>
@@ -756,7 +782,7 @@
        <item row="0" column="8">
         <widget class="QLabel" name="label_25">
          <property name="text">
-          <string>Gradient Duration Adjustment [us]</string>
+          <string>Gradient Duration Adjustment 1 [us]</string>
          </property>
         </widget>
        </item>
@@ -883,7 +909,53 @@
         </widget>
        </item>
        <item row="0" column="9">
-        <widget class="QDoubleSpinBox" name="doubleSpinBox_GDA">
+        <widget class="QDoubleSpinBox" name="doubleSpinBox_GDA1">
+         <property name="decimals">
+          <number>0</number>
+         </property>
+         <property name="minimum">
+          <double>-10000000.000000000000000</double>
+         </property>
+         <property name="maximum">
+          <double>10000000.000000000000000</double>
+         </property>
+         <property name="value">
+          <double>0.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="8">
+        <widget class="QLabel" name="label_26">
+         <property name="text">
+          <string>Gradient Duration Adjustment 2 [us]</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="9">
+        <widget class="QDoubleSpinBox" name="doubleSpinBox_GDA2">
+         <property name="decimals">
+          <number>0</number>
+         </property>
+         <property name="minimum">
+          <double>-10000000.000000000000000</double>
+         </property>
+         <property name="maximum">
+          <double>10000000.000000000000000</double>
+         </property>
+         <property name="value">
+          <double>0.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="8">
+        <widget class="QLabel" name="label_27">
+         <property name="text">
+          <string>Gradient Duration Adjustment 3 [us]</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="9">
+        <widget class="QDoubleSpinBox" name="doubleSpinBox_GDA3">
          <property name="decimals">
           <number>0</number>
          </property>
@@ -985,8 +1057,11 @@
       <height>51</height>
      </rect>
     </property>
+    <property name="whatsThis">
+     <string/>
+    </property>
     <property name="text">
-     <string>Event View</string>
+     <string>Show SeqChart</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_39">

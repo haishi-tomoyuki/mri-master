@@ -165,7 +165,7 @@ class MyForm(QtWidgets.QMainWindow):
         self.hardware.resistance_x = self.ui.doubleSpinBox_resistance_x.value()
         self.hardware.resistance_y = self.ui.doubleSpinBox_resistance_y.value()
         self.hardware.resistance_z = self.ui.doubleSpinBox_resistance_z.value()
-        self.hardware.GDA = int(self.ui.doubleSpinBox_GDA.value())
+        self.hardware.GDA = [int(self.ui.doubleSpinBox_GDA1.value()), int(self.ui.doubleSpinBox_GDA2.value()), int(self.ui.doubleSpinBox_GDA3.value())]
         
     def showPulseList(self, SeqDesign):    
         self.ui.textBrowser_history.setText('start, duration, type, value, option, gradType')
@@ -354,7 +354,10 @@ class MyForm(QtWidgets.QMainWindow):
                     self.ui.doubleSpinBox_resistance_z.setValue(float(line[13:]))
                 
                 if re.findall('GDA=', line):
-                    self.ui.doubleSpinBox_GDA.setValue(float(line[4:]))
+                    vals = line[4:].split(',')
+                    self.ui.doubleSpinBox_GDA1.setValue(float(vals[0]))
+                    self.ui.doubleSpinBox_GDA2.setValue(float(vals[1]))
+                    self.ui.doubleSpinBox_GDA3.setValue(float(vals[2]))
                 
                 if re.findall('RF90=', line):
                     self.ui.textBrowser_RFpulse90.setText(line[5:len(line)-1])
@@ -395,8 +398,7 @@ class MyForm(QtWidgets.QMainWindow):
             f.write('resistance_x='+str(self.ui.doubleSpinBox_resistance_x.value())+'\n')
             f.write('resistance_y='+str(self.ui.doubleSpinBox_resistance_y.value())+'\n')
             f.write('resistance_z='+str(self.ui.doubleSpinBox_resistance_z.value())+'\n')
-            f.write('GDA=' +str(int(self.ui.doubleSpinBox_GDA.value()))+'\n')
-            
+            f.write('GDA=' +str(int(self.ui.doubleSpinBox_GDA1.value()))+','+str(int(self.ui.doubleSpinBox_GDA2.value()))+','+str(int(self.ui.doubleSpinBox_GDA3.value()))+'\n')           
             f.write('\n')
             f.write('[RF pulse]\n')
             f.write('RF90='+self.ui.textBrowser_RFpulse90.toPlainText()+'\n')

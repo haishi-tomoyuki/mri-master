@@ -545,7 +545,7 @@ class SpinEcho(SeqDesign):
         self.type = 'SE'
         self.TE = TE_ms
         self.is3D = is3D
-        self.hardware.GDA = GDA   #refocus gradient duration の微調整量[us] :
+        self.hardware.GDA = [GDA]   #refocus gradient duration の微調整量[us] :
         
     def genSeq(self):
         self.Init()
@@ -580,7 +580,7 @@ class SpinEcho(SeqDesign):
             #refocus gradient durationの計算
             t_90_c = t_90 + seqPulseRF90.duration/2
             #RFパルスの中心時刻とslice_Gradientの印加終了時刻の差 * 1.04 + 調整時間
-            refocusGrad_duration = int((t_SliceG_e - t_90_c) * 1.04) + self.hardware.GDA    
+            refocusGrad_duration = int((t_SliceG_e - t_90_c) * 1.04) + self.hardware.GDA[0]    
             self.addSliceGrad(t_SliceG_e, refocusGrad_duration, BW=seqPulseRF90.BW, isNegative=True)
             #crusher
             self.addCrusherGrad(t_180-GRampEnc2-1500, 0xC000, 500, self.G2)
@@ -820,7 +820,7 @@ class Hardware():
         self.GrampX = 0 #us
         self.GrampY = 0 #us
         self.GrampZ = 0 #us
-        self.GDA = 0 #gradientのパルス幅調整量 [us]
+        self.GDA = [0] #gradientのパルス幅調整量 [us] (list型)
         
         self.MaxVoltage = 20    #[V]
         self.resistance_x = 1   #resistance [Ohm]
