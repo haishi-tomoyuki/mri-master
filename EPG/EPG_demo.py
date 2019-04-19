@@ -53,7 +53,7 @@ class EPG:
         self.CS[1][N-1] = np.complex(0,0)
         for i in range(N-1):
             self.CS[1][i] = self.CSm[1][i+1]
-        self.CS[0][0] = np.conj(self.CS[1][0])
+        self.CS[0][0] = np.conj(self.CSm[1][0])
         for i in range(1,N):
             self.CS[0][i] = self.CSm[0][i-1]
             
@@ -68,7 +68,7 @@ class EPG:
         self.CS[0][N-1] = np.complex(0,0)
         for i in range(N-1):
             self.CS[0][i] = self.CSm[0][i+1]
-        self.CS[1][0] = np.conj(self.CS[0][0])
+        self.CS[1][0] = np.conj(self.CSm[0][0])
         for i in range(1,N):
             self.CS[1][i] = self.CSm[1][i-1]
             
