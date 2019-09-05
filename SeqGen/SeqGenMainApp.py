@@ -28,7 +28,6 @@ class MyForm(QtWidgets.QMainWindow):
         
         #ここでシグナルスロットを実装
         self.ui.pushButton_genSeq.clicked.connect(self.GenSeq)
-        self.ui.pushButton_open_Spinecho_H_tau.clicked.connect(self.Open_SEH_tau)
         self.ui.actionSaveSeq.triggered.connect(self.saveSeqFile)
         self.ui.actionOpen_ini_file.triggered.connect(self.LoadIniFileDialog)
         self.ui.actionSave_ini_file.triggered.connect(self.SaveIniFileDialog)
@@ -53,14 +52,23 @@ class MyForm(QtWidgets.QMainWindow):
         if self.ui.tabWidget_ImageParams.currentIndex() == 0:
             self.GenSeq_SE()
         if self.ui.tabWidget_ImageParams.currentIndex() == 1:
-            self.GenSeq_SEH()
+            self.GenSeq_GE()
         
     def GenSeq_SE(self):
         #self.close
         TE = self.ui.doubleSpinBox_SE_TE.value()
         _is3D = self.ui.checkBox_SE_is3D.isChecked()
-        if not hasattr(self,"SE"):          
-            self.SE = SpinEcho(TE, self.hardware, is3D=_is3D)
+        if self.ui.checkBox_SE_isUD_RFPulse90.isChecked():  #User-defined RF pulse
+            filename_RF90 = self.ui.textBrowser_RFpulse90.toPlainText()
+        else:
+            filename_RF90 = None
+        if self.ui.checkBox_SE_isUD_RFPulse180.isChecked():  #User-defined RF pulse
+            filename_RF180 = self.ui.textBrowser_RFpulse180.toPlainText()
+        else:
+            filename_RF180 = None
+#        if not hasattr(self,"SE"):          
+#            self.SE = SpinEcho(TE, self.hardware, is3D=_is3D, filename_RF90 = filename_RF90, filename_RF180 = filename_RF180)
+        self.SE = SpinEcho(TE, self.hardware, is3D=_is3D, filename_RF90 = filename_RF90, filename_RF180 = filename_RF180)
         self.GetGeneralParams(self.SE)
         self.SE.TE = self.ui.doubleSpinBox_SE_TE.value()
         self.SE.is3D = self.ui.checkBox_SE_is3D.isChecked()
@@ -74,18 +82,32 @@ class MyForm(QtWidgets.QMainWindow):
         self.showNotes(self.SE)
         self.RefreshGeneralParams(self.SE)
 
-    def Open_SEH_tau(self):
-        if not hasattr(self,"SEH"):
-            self.SEH = SpinEcho_H(self.hardware)
-        if self.ui.radioButton_ADevent.isChecked() == True:
-            self.SEH.AD_event = True
+    def GenSeq_GE(self):
+        #self.close
+        TE = self.ui.doubleSpinBox_GE_TE.value()
+        _is3D = self.ui.checkBox_GE_is3D.isChecked()
+        if self.ui.checkBox_GE_isUD_RFPulse.isChecked():  #User-defined RF pulse
+            filename_RF90 = self.ui.textBrowser_RFpulse90.toPlainText()
         else:
-            self.SEH.AD_event = False
-        self.SEH.filename_tau = self.openFileNameDialog()
-        self.SEH.fromfile(self.SEH.filename_tau)
-        for tau in self.SEH.tau_list:
-            self.ui.textBrowser_Spinecho_H_tau.append(str(tau))
+            filename_RF90 = None
             
+        print(filename_RF90)
+#        if not hasattr(self,"GE"):          
+#            self.GE = GradientEcho(TE, self.hardware, is3D=_is3D, filename_RF90 = filename_RF90)
+        self.GE = GradientEcho(TE, self.hardware, is3D=_is3D, filename_RF90 = filename_RF90)
+        self.GetGeneralParams(self.GE)
+        self.GE.TE = self.ui.doubleSpinBox_GE_TE.value()
+        self.GE.is3D = self.ui.checkBox_GE_is3D.isChecked()
+        self.GE.genSeq()
+        self.GE.addComment(self.ui.textEdit_comments.toPlainText())
+        self.GE.CheckCurrentLimit()
+        self.showPulseList(self.GE)
+        self.GE.pulse2event()
+        #self.showEventList(self.GE)
+        self.GE.gen_notes()
+        self.showNotes(self.GE)
+        self.RefreshGeneralParams(self.GE)
+
     def Open_RFpulse90(self):
 #        self.filename_RF90 = os.path.basename(self.openFileNameDialog())
         self.filename_RF90 = self.openFileNameDialog()
@@ -95,24 +117,7 @@ class MyForm(QtWidgets.QMainWindow):
 #        self.filename_RF180 = os.path.basename(self.openFileNameDialog())
         self.filename_RF180 = self.openFileNameDialog()
         self.ui.textBrowser_RFpulse180.setText(self.filename_RF180)
-            
-    def GenSeq_SEH(self):
-        if not hasattr(self,"SEH"):
-            self.SEH = SpinEcho_H(self.hardware)
-        self.filename_RF90 = self.ui.textBrowser_RFpulse90.toPlainText()
-        self.filename_RF180 = self.ui.textBrowser_RFpulse180.toPlainText()
-        self.GetGeneralParams(self.SEH)
-        self.SEH.genSeq(filename_RF90 = self.filename_RF90, filename_RF180 = self.filename_RF180)
-        print('OK')
-        self.SEH.addComment(self.ui.textEdit_comments.toPlainText())
-        self.SEH.CheckCurrentLimit()
-        self.showPulseList(self.SEH)
         
-        self.SEH.pulse2event()
-        #self.showEventList(self.seqDesign)
-        self.SEH.gen_notes()
-        self.showNotes(self.SEH)
-        self.RefreshGeneralParams(self.SEH)
        
         
     def GetGeneralParams(self, seqDesign):
@@ -126,7 +131,7 @@ class MyForm(QtWidgets.QMainWindow):
         seqDesign.TR = int(self.ui.spinBox_TR.value())
         seqDesign.DW = int(self.ui.spinBox_DW.value())
         seqDesign.SW = self.ui.doubleSpinBox_SW.value()
-        seqDesign.OF = self.ui.doubleSpinBox_OF.value()
+        seqDesign.OF = [self.ui.doubleSpinBox_OF.value()]
         seqDesign.FOVr = self.ui.doubleSpinBox_FOVr.value()
         seqDesign.FOVe1 = self.ui.doubleSpinBox_FOVe1.value()
         seqDesign.FOVe2 = self.ui.doubleSpinBox_FOVe2.value()
@@ -147,7 +152,7 @@ class MyForm(QtWidgets.QMainWindow):
         self.ui.spinBox_TR.setValue(seqDesign.TR)        
         self.ui.spinBox_DW.setValue(seqDesign.DW)        
         self.ui.doubleSpinBox_SW.setValue(seqDesign.SW)        
-        self.ui.doubleSpinBox_OF.setValue(seqDesign.OF)        
+        self.ui.doubleSpinBox_OF.setValue(seqDesign.OF[0])        
         self.ui.doubleSpinBox_FOVr.setValue(seqDesign.FOVr)  
         self.ui.doubleSpinBox_FOVe1.setValue(seqDesign.FOVe1)  
         self.ui.doubleSpinBox_FOVe2.setValue(seqDesign.FOVe2)
@@ -197,9 +202,8 @@ class MyForm(QtWidgets.QMainWindow):
             if hasattr(self,"SE"):
                 self.SE.SaveSeq(filename)
         if self.ui.tabWidget_ImageParams.currentIndex() == 1:
-            if hasattr(self,"SEH"):
-                self.SEH.SaveSeq(filename)
-            
+            if hasattr(self,"GE"):
+                self.GE.SaveSeq(filename)            
         
     def openFileNameDialog(self):    
         options = QFileDialog.Options()
@@ -225,50 +229,7 @@ class MyForm(QtWidgets.QMainWindow):
  #           print(fileName)
         return fileName
     
-    """
-    def seqchart(self, seqDesign):
-        seqDesign.seq_GX = Calc_seqchart.Grad_simple(seqDesign.event_GX, seqDesign.TR, seqDesign.N1, seqDesign.N2, Gramp=seqDesign.hardware.GrampX)   
-        seqDesign.seq_GY = Calc_seqchart.Grad_simple(seqDesign.event_GY, seqDesign.TR, seqDesign.N1, seqDesign.N2, Gramp=seqDesign.hardware.GrampY)
-        seqDesign.seq_GZ = Calc_seqchart.Grad_simple(seqDesign.event_GZ, seqDesign.TR, seqDesign.N1, seqDesign.N2, Gramp=seqDesign.hardware.GrampZ)
-        seqDesign.seq_RFx, seqDesign.seq_RFy = Calc_seqchart.RF(seqDesign.event_RF, seqDesign.TR)
-        seqDesign.seq_AD = Calc_seqchart.AD(seqDesign.event_AD, seqDesign.TR, seqDesign.NR, seqDesign.DW)
-    
-    def plot_seqchart(self, seqDesign):
-        fig = plt.figure()    
-        
-        #ax1 = fig.add_subplot(511)
-        #ax2 = fig.add_subplot(512, sharex=ax1)
-        #ax3 = fig.add_subplot(513, sharex=ax1)
-        #ax4 = fig.add_subplot(514, sharex=ax1)
-        #ax5 = fig.add_subplot(515, sharex=ax1)
-        
-        ax1 = fig.add_axes((0.15, 0.82, 0.8, 0.18))
-        ax2 = fig.add_axes((0.15, 0.64, 0.8, 0.18), sharex=ax1)
-        ax3 = fig.add_axes((0.15, 0.46, 0.8, 0.18), sharex=ax1)
-        ax4 = fig.add_axes((0.15, 0.28, 0.8, 0.18), sharex=ax1)
-        ax5 = fig.add_axes((0.15, 0.1, 0.8, 0.18), sharex=ax1)
-        
-        ax1.tick_params(labelbottom="off")
-        ax2.tick_params(labelbottom="off")
-        ax3.tick_params(labelbottom="off")
-        ax4.tick_params(labelbottom="off")
-        ax5.set_xlabel("Time [us]")
-        ax1.set_ylabel("RF")
-        ax2.set_ylabel("GX")
-        ax3.set_ylabel("GY")
-        ax4.set_ylabel("GZ")
-        ax5.set_ylabel("AD")
-        
-        ax1.plot(seqDesign.seq_RFx[:,], 'r-')
-        ax1.plot(seqDesign.seq_RFy[:,], 'b-')
-        ax2.plot(seqDesign.seq_GX[:,0], 'r-')
-        ax3.plot(seqDesign.seq_GY[:,0], 'b-')
-        ax4.plot(seqDesign.seq_GZ[:,0], 'g-')
-        ax5.plot(seqDesign.seq_AD[:,], 'y-')
-        #fig.tight_layout()  # タイトルとラベルが被るのを解消   
-        plt.show()
-    """
-    
+  
     
     def showEventView(self):
        # print(vars(self.SE))
@@ -279,14 +240,14 @@ class MyForm(QtWidgets.QMainWindow):
                 self.SE.plot_seqchart()
                 #self.seqchart(self.SE)
                 #self.plot_seqchart(self.SE)
-        
+
         if self.ui.tabWidget_ImageParams.currentIndex() == 1:
-            if hasattr(self,"SEH"):
-                self.SEH.Seqchart()
-                self.SEH.plot_seqchart()
-                #self.seqchart(self.SEH)
-                #self.plot_seqchart(self.SEH)
-                
+            if hasattr(self,"GE"):
+                self.GE.Seqchart()
+                self.GE.plot_seqchart()
+                #self.seqchart(self.GE)
+                #self.plot_seqchart(self.GE)
+                        
                 
     def LoadIniFileDialog(self):
         filename = self.openFileNameDialog()

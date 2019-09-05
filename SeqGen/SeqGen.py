@@ -30,7 +30,7 @@ class SeqDesign:
         self.S2 = 256
         self.DU = 10
         self.SW = 5         #mm
-        self.OF = 0
+        self.OF = [0]
         self.TR = 200       #ms
         self.DW = 10        #us
         
@@ -77,8 +77,8 @@ class SeqDesign:
         self.pulse_RF.append(seqPulseRF)
         return seqPulseRF
     """
-    def addRFpulse(self, t_start, rfType, duration=1000, phase=0, filename=None, RFpulseShapeX=None, RFpulseShapeY=None, comment=None):
-        seqPulseRF = SeqPulseRF(t_start, rfType, duration=duration, phase=phase, filename=filename, RFpulseShapeX=RFpulseShapeX, RFpulseShapeY=RFpulseShapeY, comment=comment)
+    def addRFpulse(self, t_start, rfType, duration=1000, phase=0, BW=-1, filename=None, RFpulseShapeX=None, RFpulseShapeY=None, comment=None):
+        seqPulseRF = SeqPulseRF(t_start, rfType, duration=duration, phase=phase, BW=BW, filename=filename, RFpulseShapeX=RFpulseShapeX, RFpulseShapeY=RFpulseShapeY, comment=comment)
         self.pulse_RF.append(seqPulseRF)
         return seqPulseRF
     #AD 関係    
@@ -268,7 +268,8 @@ class SeqDesign:
         self.notes.append(':DW '+str(self.DW))
         self.notes.append('')
         self.notes.append(':SW '+str(self.SW))
-        self.notes.append(':OF '+str(self.OF))
+        for i in range(len(self.OF)):
+            self.notes.append(':OF '+str(self.OF[i]))
         
         self.notes.append('')
         
@@ -385,39 +386,6 @@ class SeqDesign:
                 f.write(line+'\n')
             f.close()
     
-    """
-    def LoadRFPulse(self, filename):
-        if filename != '':
-            try:
-                f = open(filename)  
-            except OSError as err:
-                print("OS error: {0}".format(err))
-                return -1
-            else:
-                lines = f.readlines() # 1行毎にファイル終端まで全て読む(改行文字も含まれる)
-                f.close()
-                
-                seqPulseRF = SeqPulseRF(0, RFType.UD, filename = filename)
-                
-                seqPulseRF.option = '=['+filename+']'
-                
-                temp = lines[1].split('\t')
-                Npoints = int(lines[0])
-                ReadoutDwell =  int(int(temp[0]) *0.1)                          #us
-                seqPulseRF.duration = Npoints * ReadoutDwell                #duration[us]
-                amp = float(temp[1])  #増幅率
-                seqPulseRF.BW = float(temp[2])*1000                           #BW[Hz]
-                seqPulseRF.RFpulseShapeX = np.ones((seqPulseRF.duration))  #1us刻み
-                seqPulseRF.RFpulseShapeY = np.zeros((seqPulseRF.duration))  #1us刻み
-                for i in range(len(lines)-2):
-                    temp = lines[i+2].split('\t')
-                    seqPulseRF.RFpulseShapeX[i*ReadoutDwell:(i+1)*ReadoutDwell] = int(temp[0])*amp
-                    seqPulseRF.RFpulseShapeY[i*ReadoutDwell:(i+1)*ReadoutDwell] = int(temp[1])*amp
-                    
-                return seqPulseRF
-
-        return -1   
-        """
         
     def LoadIniFile(self,filename):
         with open(filename, 'rt') as f:
@@ -445,7 +413,7 @@ class SeqDesign:
                 if re.findall('SW=', line):
                     self.SW=float(line[3:])
                 if re.findall('OF=', line):
-                    self.OF=float(line[3:])
+                    self.OF=[float(line[3:])]
                 
                 if re.findall('GX=', line):
                     self.hardware.GX=float(line[3:])
@@ -487,7 +455,7 @@ class SeqDesign:
             f.write('TR='+int(self.TR)+'\n')
             f.write('DW='+int(self.DW)+'\n')
             f.write('SW='+float(self.SW)+'\n')
-            f.write('OF='+float(self.OF)+'\n')
+            f.write('OF='+float(self.OF[0])+'\n')
             f.write('\n')
             f.write('[Gradient]\n')
             f.write('GX='+float(self.hardware.GX)+'\n')
@@ -534,18 +502,37 @@ class SeqDesign:
         ax5.plot(self.seq_AD[:,], 'y-')
         #fig.tight_layout()  # タイトルとラベルが被るのを解消    
         plt.show()
+        
+    def Oblique(self, axis, angle1, angle2):
+        """
+        axis = 'X' or 'Y' or 'Z'
+        angle1, angle2 : degree (right-handed system)
+        transfer pulse_GX, pulse_GY, pulse_GZ, to oblique plane
+        """
+        None
  
                 
 class SpinEcho(SeqDesign):
     """
     TE : ms
     """
-    def __init__(self, TE_ms, hardware, is3D = True, GDA = 0):
+    def __init__(self, TE_ms, hardware, is3D = True, GDA = [0], \
+                 filename_RF90 = None, filename_RF180 = None, \
+                 duration_RF90 = 1000, duration_RF180 = 1000, \
+                 BW_RF90 = -1, BW_RF180 = -1):
         super().__init__(hardware)
         self.type = 'SE'
         self.TE = TE_ms
         self.is3D = is3D
-        self.hardware.GDA = [GDA]   #refocus gradient duration の微調整量[us] :
+        self.hardware.GDA = GDA   #refocus gradient duration の微調整量[us] :
+        
+        self.filename_RF90 = filename_RF90
+        self.filename_RF180 = filename_RF180
+        self.duration_RF90 = duration_RF90
+        self.duration_RF180 = duration_RF180
+        self.BW_RF90 = BW_RF90
+        self.BW_RF180 = BW_RF180
+        
         
     def genSeq(self):
         self.Init()
@@ -567,11 +554,28 @@ class SpinEcho(SeqDesign):
         t_AD_c = t_90 + te              #center time (ADC)
         t_AD = t_AD_c - d_AD/2       #start time (ADC)
         if self.is3D:
-            seqPulseRF90 = self.addRF90(t_90)
-            seqPulseRF180 = self.addRF180(t_180, phase=90)
+            if self.filename_RF90 is not None:
+                seqPulseRF90 = self.addRFpulse(t_90, RFType.UD, filename = self.filename_RF90, \
+                                               duration = self.duration_RF90, BW = self.BW_RF90)
+            else:
+                seqPulseRF90 = self.addRF90(t_90)
+            if self.filename_RF180 is not None:
+                seqPulseRF180 = self.addRFpulse(t_180, RFType.UD, filename = self.filename_RF180, \
+                                                duration = self.duration_RF180, BW = self.BW_RF180)
+            else:
+                seqPulseRF180 = self.addRF180(t_180, phase=90)
+                
         else:  #2D
-            seqPulseRF90 = self.addRFpulse(t_90, RFType.MS90, phase=0)
-            seqPulseRF180 = self.addRF180(t_180)
+            if self.filename_RF90 is not None:
+                seqPulseRF90 = self.addRFpulse(t_90, RFType.MS90UD, filename = self.filename_RF90, \
+                                               duration = self.duration_RF90, BW = self.BW_RF90)
+            else:         
+                seqPulseRF90 = self.addRFpulse(t_90, RFType.MS90, phase=0)
+            if self.filename_RF180 is not None:
+                seqPulseRF180 = self.addRFpulse(t_180, RFType.MS180UD, filename = self.filename_RF180, \
+                                                duration = self.duration_RF180, BW = self.BW_RF180)
+            else:
+                seqPulseRF180 = self.addRF180(t_180)
             #slice G
             t_SliceG_s = t_90-500
             d_SliceG =  seqPulseRF90.duration+1000
@@ -585,7 +589,7 @@ class SpinEcho(SeqDesign):
             #crusher
             self.addCrusherGrad(t_180-GRampEnc2-1500, 0xC000, 500, self.G2)
             self.addCrusherGrad(t_180+seqPulseRF180.duration+300, 0xC000, 500, self.G2)
-            
+        
         #direction : self.Gr, self.G1, self.G2
         self.addAD(t_AD, d_AD)
         #read (dephase)
@@ -601,6 +605,83 @@ class SpinEcho(SeqDesign):
         #2nd encode
         if self.is3D:
             t_enc2 = t_180 + seqPulseRF180.duration + 100  #margin 100us
+            self.addPE2Grad(t_enc2)
+        
+        self.CheckTR()
+
+class GradientEcho(SeqDesign):
+    """
+    TE : ms
+    """
+    def __init__(self, TE_ms, hardware, is3D = True, GDA = [0], \
+                 filename_RF90 = None, duration_RF90 = 1000, BW_RF90 = -1):
+        super().__init__(hardware)
+        self.type = 'GE'
+        self.TE = TE_ms
+        self.is3D = is3D
+        self.hardware.GDA = GDA   #refocus gradient duration の微調整量[us] :
+        self.filename_RF90 = filename_RF90
+        self.duration_RF90 = duration_RF90
+        self.BW_RF90 = BW_RF90
+        
+    def genSeq(self):
+        self.Init()
+        
+        self.comments.append(';FOVr[cm]='+ str(self.FOVr))
+        self.comments.append(';FOVe1[cm]='+ str(self.FOVe1))
+        self.comments.append(';FOVe2[cm]='+ str(self.FOVe2))
+        
+        #Grampの取得
+        GRampRead = self.getGradRamp(self.Gr)
+        GRampEnc1 = self.getGradRamp(self.G1)
+        GRampEnc2 = self.getGradRamp(self.G2)
+
+        te = self.TE * 1e3              #[us]
+        t_90 = 5000     #start time (RF90) [us]
+
+        d_AD = self.DW * self.NR
+        t_AD_c = t_90 + te              #center time (ADC)
+        t_AD = t_AD_c - d_AD/2       #start time (ADC)
+        if self.is3D:
+            if self.filename_RF90 is not None:
+                seqPulseRF90 = self.addRFpulse(t_90, RFType.UD, \
+                            filename = self.filename_RF90, duration = self.duration_RF90,\
+                            BW = self.BW_RF90)
+            else:
+                seqPulseRF90 = self.addRF90(t_90)
+        else:  #2D
+            if self.filename_RF90 is not None:
+                seqPulseRF90 = self.addRFpulse(t_90, RFType.MS90UD, \
+                            filename = self.filename_RF90, duration = self.duration_RF90,\
+                            BW = self.BW_RF90)
+            else:
+                seqPulseRF90 = self.addRFpulse(t_90, RFType.MS90, phase=0)
+            #slice G
+            t_SliceG_s = t_90-500
+            d_SliceG =  seqPulseRF90.duration+1000
+            t_SliceG_e = t_SliceG_s + d_SliceG
+            self.addSliceGrad(t_SliceG_s, d_SliceG, BW=seqPulseRF90.BW)  
+            #refocus gradient durationの計算
+            t_90_c = t_90 + seqPulseRF90.duration/2
+            #RFパルスの中心時刻とslice_Gradientの印加終了時刻の差 * 1.04 + 調整時間
+            refocusGrad_duration = int((t_SliceG_e - t_90_c) * 1.04) + self.hardware.GDA[0]    
+            self.addSliceGrad(t_SliceG_e, refocusGrad_duration, BW=seqPulseRF90.BW, isNegative=True)
+            
+        #direction : self.Gr, self.G1, self.G2
+        self.addAD(t_AD, d_AD)
+        #read (dephase)
+        d_Read_dephase = d_AD/2 + GRampRead/2
+        t_Read_s = t_AD - d_AD/2 - GRampRead*3/2
+        self.addReadGrad(t_Read_s, d_Read_dephase, isNegative=True)
+        #read (rephase)
+        t_Read_s = t_AD - GRampRead
+        self.addReadGrad(t_Read_s, d_AD + GRampRead + 1000)
+        #1st encode
+        t_enc1 = t_90 + seqPulseRF90.duration + 100  #margin 100us
+        self.addPE1Grad(t_enc1)
+        #2nd encode
+        if self.is3D:
+            t_enc2 = t_90 + seqPulseRF90.duration + 100  #margin 100us
             self.addPE2Grad(t_enc2)
         
         self.CheckTR()
@@ -670,7 +751,7 @@ class SeqPulse:
         self.comment = comment              #''
         
 class SeqPulseRF(SeqPulse):
-    def __init__(self, t_start, rfType, duration=120, phase=0, filename=None, RFpulseShapeX=None, RFpulseShapeY=None, comment=None):
+    def __init__(self, t_start, rfType, duration=120, phase=0, BW=-1, filename=None, RFpulseShapeX=None, RFpulseShapeY=None, comment=None):
         super().__init__('RF', t_start, 0, duration=duration, filename=filename, comment=comment)
         """
         t_start
@@ -733,6 +814,19 @@ class SeqPulseRF(SeqPulse):
             self.BW = 8000
         if rfType == RFType.UD:
             value = 0x000F
+            self.duration = duration
+            self.option = '=['+filename+']'
+            self.BW = BW
+        if rfType == RFType.MS90UD:
+            value = 0x000D
+            self.option = '=['+filename+']'
+            self.duration = duration
+            self.BW = BW
+        if rfType == RFType.MS180UD:
+            value = 0x000E
+            self.duration = duration
+            self.option = '=['+filename+']'
+            self.BW = BW
             
         self.value = '%.4X' % int(value)  
         self.rfType = rfType
@@ -741,7 +835,7 @@ class SeqPulseRF(SeqPulse):
         self.RFpulseShapeY = RFpulseShapeY
         
         if filename is not None:
-            self.LoadRFPulse(filename)
+            self.LoadRFPulse(filename)  #self.durationとself.BWが書き換えられる
         
     def LoadRFPulse(self, filename):
         if filename != '':
@@ -754,7 +848,7 @@ class SeqPulseRF(SeqPulse):
                 lines = f.readlines() # 1行毎にファイル終端まで全て読む(改行文字も含まれる)
                 f.close()
                 
-                self.rfType = RFType.UD
+                #self.rfType = RFType.UD    #これどうする
                 self.filename = filename
                 self.option = '=['+filename+']'
                 
@@ -799,17 +893,19 @@ class GradType(enum.Enum):  #GradTypeを列挙型で定義しておく
     Crusher = 'Crusher'
 
 class RFType(enum.Enum):  #RFPuplseを列挙型で定義しておく
-    sinc90_8kHz = '0x0000'
-    sinc180_8kHz = '0x0001'
-    hard90 = '0x0002'
-    hard180 = '0x0003'
-    sinc90_4kHz = '0x0004'
-    sinc180_4kHz = '0x0005'
-    sinc90_4kHz_PI = '0x0006'
-    sinc180_4kHz_PI = '0x0007'
-    MS90 = '0x000D'
-    MS180 = '0x000E'
-    UD = '0x000F'
+    sinc90_8kHz = 0
+    sinc180_8kHz = 1
+    hard90 = 2
+    hard180 = 3
+    sinc90_4kHz = 4
+    sinc180_4kHz = 5
+    sinc90_4kHz_PI = 6
+    sinc180_4kHz_PI = 7
+    MS90 = 8
+    MS180 = 9
+    UD = 10
+    MS90UD = 11
+    MS180UD = 12
     
 class Hardware():
     def __init__(self):
@@ -830,12 +926,17 @@ class Hardware():
 
 
 
-def test1():
+def test_SE():
     hardware = Hardware()
-    se = SpinEcho(10, hardware, is3D=False)
+#    se = SpinEcho(10, hardware, is3D=False)
+#    se = SpinEcho(10, hardware, is3D=False, \
+#        filename_RF90 = 'test.txt', filename_RF180 = 'test180.txt', duration_RF90 = 1000, duration_RF180 = 1000,\
+#        BW_RF90 = -1, BW_RF180 = -1)
+    se = SpinEcho(10, hardware, is3D=False, filename_RF90 = 'sinc_2ms_2kHz.txt')
     se.DW = 10
     se.NR = 256
     se.TR = 50
+    se.OF = [-10,0,10]
     se.genSeq()
     se.addComment('This is a test')
     se.showPulseList()
@@ -855,7 +956,7 @@ def test1():
     plt.plot(se.seq_GZ[:,0])
     """
     se.plot_seqchart()
-    
+
 def test_SEH():
     hardware = Hardware()
     SEH = SpinEcho_H(hardware)
@@ -877,10 +978,35 @@ def test_SEH():
     plt.show()
     """
     SEH.plot_seqchart()
+
+def test_GE():
+    hardware = Hardware()
+    hardware.GrampX = 100 #us
+    hardware.GrampY = 100 #us
+    hardware.GrampZ = 100 #us
+#    ge = GradientEcho(10, hardware, is3D=False)
+#    ge = GradientEcho(10, hardware, is3D=False, filename_RF90 = 'sinc_2ms_2kHz.txt',\
+#                      duration_RF90 = 1000, BW_RF90 = -1)
+    ge = GradientEcho(10, hardware, is3D=False, filename_RF90 = 'sinc_2ms_2kHz.txt')
+    ge.DW = 10
+    ge.NR = 256
+    ge.TR = 50
+    ge.genSeq()
+    ge.addComment('This is a test')
+    ge.showPulseList()
+    ge.pulse2event()
+    ge.CheckCurrentLimit()
+    #ge.showEventList()
+    ge.gen_notes()
+    ge.showNotes()
+    ge.Seqchart()
+    #ge.Savegeq('Gradientecho.geq')
+    ge.plot_seqchart()
     
 if __name__ == '__main__':
-    test1()
-    test_SEH()
+    test_SE()
+    #test_SEH()
+    #test_GE()
     
 
 
